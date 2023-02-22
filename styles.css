@@ -36,3 +36,12 @@ form {
     text-align: center;
     font-size: 18px;
 }
+
+.trail {
+    /* className for the trail elements */
+    position: absolute;
+    height: 6px;
+    width: 6px;
+    border-radius: 3px;
+    background: teal;
+}

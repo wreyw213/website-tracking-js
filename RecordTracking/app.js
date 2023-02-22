@@ -2053,6 +2053,11 @@ async function startTracking() {
                 console.log("moving mouse", elem.pageX)
                 cursor.style.left = (px + elem.x) + "px";
                 cursor.style.top = (py + elem.y) + "px";
+
+                // for trail
+                mouse.x = elem.x;
+                mouse.y = elem.y;
+
                 await _wait(50)
 
                 break
@@ -2068,41 +2073,65 @@ async function startTracking() {
     }
 }
 
-// Capture user input events
-// document.addEventListener('click', function (event) {
-//     // Send user input data to server
-//     console.log("Click Event =>>>", event.target.tagName, new Date())
-//     trackingArr.push({ time: new Date().toTimeString(), event: EVENT_TYPES.CLICK, name: event.target.tagName })
-// });
-
-// // Capture changes in browser history
-// window.onpopstate = function (event) {
-//     trackingArr.push({ time: new Date().toTimeString(), event: EVENT_TYPES.URL, name: event.state.url })
-//     console.log("URL change Event =>>>", event.state.url, new Date())
-// };
-
-
-// // Track mouse movements
-// document.addEventListener('mousemove', (event) => {
-//     console.log('Mouse moved=>>>>>', event.pageX, event.pageY);
-//     trackingArr.push({ time: new Date().toTimeString(), event: EVENT_TYPES.MOUSE, x: event.pageX, y: event.pageY })
-// });
-
-// // Track input on form fields
-// const formFields = document.querySelectorAll('input, textarea');
-
-// formFields.forEach((field) => {
-//     field.addEventListener('input', (event) => {
-//         console.log('Input changed:', field.name, field.value);
-//         trackingArr.push({ time: new Date().toTimeString(), event: EVENT_TYPES.INPUT, name: field.name, value: field.value })
-//     });
-// });
-
-// endSessionBtn.addEventListener('click', () => {
-//     localStorage.setItem('trackingUserDetails', JSON.stringify(trackingArr))
-// })
 
 
 
 
+
+
+//  starting Trail
+var dots = [],
+    mouse = {
+        x: 0,
+        y: 0
+    };
+
+var Dot = function () {
+    this.x = 0;
+    this.y = 0;
+    this.node = (function () {
+        var n = document.createElement("div");
+        n.className = "trail";
+        document.body.appendChild(n);
+        return n;
+    }());
+};
+
+Dot.prototype.draw = function () {
+    this.node.style.left = this.x + "px";
+    this.node.style.top = this.y + "px";
+};
+
+// Creates the Dot objects, populates the dots array
+for (var i = 0; i < 12; i++) {
+    var d = new Dot();
+    dots.push(d);
+}
+
+// This is the screen redraw function
+function draw() {
+    var x = mouse.x,
+        y = mouse.y;
+
+    dots.forEach(function (dot, index, dots) {
+        var nextDot = dots[index + 1] || dots[0];
+
+        dot.x = x;
+        dot.y = y;
+        dot.draw();
+        x += (nextDot.x - dot.x) * .6;
+        y += (nextDot.y - dot.y) * .6;
+
+    });
+}
+
+
+
+
+function animate() {
+    draw();
+    requestAnimationFrame(animate);
+}
+
+animate();
 
