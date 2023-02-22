@@ -1,9 +1,9 @@
-const form = document.getElementById('upload-form');
 const fileInput = document.getElementById('file-input');
 const submitBtn = document.getElementById('submit-btn');
 const resultDiv = document.getElementById('result');
 const endSessionBtn = document.getElementById('end-session-btn');
 // import data from './data.json'
+const BASE_URL = 'https://c005-122-173-30-84.ngrok.io/'
 
 const data = [
     {
@@ -2034,11 +2034,29 @@ const EVENT_TYPES = {
     INPUT: 'input'
 }
 
-window.onload = startTracking
+window.onload = getTrackDataApi
+
+async function getTrackDataApi() {
+    try {
+        const res = await fetch(BASE_URL + "gettrackingdata", {
+            method: 'post',
+            headers: {
+                "Content-Type": "application/json"
+            },
+        })
+
+        const resData = await res.json()
+
+        console.log("data", resData);
+        startTracking(resData.data)
+    } catch {
+        alert('no data found')
+    }
+}
 
 const _wait = (delay = 200) => new Promise(resolve => setTimeout(resolve, delay))
 
-async function startTracking() {
+async function startTracking(data = []) {
     // const value = localStorage.getItem('trackingUserDetails')
     // const data = JSON.parse(value)
     // const data = require('./data.json')
