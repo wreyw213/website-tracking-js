@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Tracking WebPage</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        img {
+            pointer-events: none;
+            /* doing this makes sure .elementFromPoint
+        do not acquires the image cursor object */
+            position: absolute;
+        }
+
+        /* makes the cursor invisible */
+
+        * {
+            cursor: none;
+        }
+    </style>
+</head>
+
+<body>
+    <img id="cursor" src="https://media.geeksforgeeks.org/wp-content/uploads/20200319212118/cursor2.png" width="15"
+        height="20" />
+
+    <h1>Submit A Form</h1>
+    <form id="upload-form">
+        <label>Name</label>
+        <input type="text" id="name-input" name="name">
+        <label>Email</label>
+        <input type="text" id="email-input" name="email">
+        <label>Address</label>
+        <input type="text" id="address-input" name="address">
+        <button type="submit" id="submit-btn">Save</button>
+    </form>
+
+    <button type="submit" id="end-session-btn">End Session</button>
+
+    <div id="result"></div>
+    <script src="app.js"></script>
+</body>
+
+</html>
