@@ -4,8 +4,9 @@ const submitBtn = document.getElementById('submit-btn');
 const resultDiv = document.getElementById('result');
 const endSessionBtn = document.getElementById('end-session-btn');
 
-const BASE_URL = 'http://7174-122-173-24-198.ngrok.io'
+// const BASE_URL = 'http://7174-122-173-24-198.ngrok.io'
 let trackingArr = []
+let changed = true
 let startTime;
 
 const EVENT_TYPES = {
@@ -14,18 +15,20 @@ const EVENT_TYPES = {
     URL: 'url',
     INPUT: 'input'
 }
+let count = 0
 
 window.onload = init
 
 function init() {
     startTime = new Date().getTime()
-    // captureDom()
-
-    const interval1 = setInterval(captureDom, interval);
-
-    setTimeout(() => {
-        clearInterval(interval1)
-    }, 10000)
+    const p = setInterval(() => {
+        console.log("changed=>>>>", changed)
+        if (changed) {
+            count++;
+            captureScreenShot()
+        }
+        if (count > 20) clearInterval(p)
+    }, 200);
 }
 
 // Define the interval (in milliseconds) between captures
@@ -38,19 +41,19 @@ const storageKey = 'domHistory';
 let domHistory = [];
 
 // Define a function to capture the DOM and save it to the array and local storage
-async function captureDom() {
-    // Fetch the external CSS files and convert them to inline styles
-    const cssUrls = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map(link => link.href);
-    const cssPromises = cssUrls.map(url => fetch(url).then(res => res.text()));
-    const cssTexts = await Promise.all(cssPromises);
-    const inlineStyles = cssTexts.map(cssText => `<style>${cssText}</style>`).join('');
+// async function captureDom() {
+//     // Fetch the external CSS files and convert them to inline styles
+//     const cssUrls = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map(link => link.href);
+//     const cssPromises = cssUrls.map(url => fetch(url).then(res => res.text()));
+//     const cssTexts = await Promise.all(cssPromises);
+//     const inlineStyles = cssTexts.map(cssText => `<style>${cssText}</style>`).join('');
 
-    // Capture the HTML of the page and include the inline styles
-    const dom = document.documentElement.outerHTML;
-    const domWithStyles = `${dom.replace(/<\/head>/i, `${inlineStyles}</head>`)}`
-    domHistory.push(domWithStyles);
-    localStorage.setItem(storageKey, JSON.stringify(domHistory));
-}
+//     // Capture the HTML of the page and include the inline styles
+//     const dom = document.documentElement.outerHTML;
+//     const domWithStyles = `${dom.replace(/<\/head>/i, `${inlineStyles}</head>`)}`
+//     domHistory.push(domWithStyles);
+//     localStorage.setItem(storageKey, JSON.stringify(domHistory));
+// }
 
 // Call the captureDom() function every 2 seconds
 
@@ -74,9 +77,9 @@ async function captureDom() {
 // }
 
 // // Track mouse movements
-// document.addEventListener('mousemove', (event) => {
-//     trackingArr.push({ time: new Date().toTimeString(), event: EVENT_TYPES.MOUSE, x: event.pageX, y: event.pageY, })
-// });
+document.addEventListener('mousemove', (event) => {
+    trackingArr.push({ time: new Date().toTimeString(), event: EVENT_TYPES.MOUSE, x: event.pageX, y: event.pageY, })
+});
 
 // // Track input on form fields
 // const formFields = document.querySelectorAll('input, textarea');
@@ -84,31 +87,41 @@ async function captureDom() {
 // formFields.forEach((field) => {
 //     field.addEventListener('input', (event) => {
 //         console.log('Input changed:', field.name, field.value);
-//         trackingArr.push({ time: new Date().toTimeString(), event: EVENT_TYPES.INPUT, name: field.name, value: field.value, elemId: event.target.id })
+//         changed = true
+//         // trackingArr.push({ time: new Date().toTimeString(), event: EVENT_TYPES.INPUT, name: field.name, value: field.value, elemId: event.target.id })
 //     });
 // });
 
-// endSessionBtn.addEventListener('click', async (e) => {
+const formFields = document.querySelectorAll('input')
 
-//     e.preventDefault()
-//     const duration = new Date().getTime() - startTime
-//     console.log("duration", duration);
+formFields.forEach((field) => {
+    field.addEventListener('input', (event) => {
+        console.log('Input changed:', field.name, field.value);
+        changed = true
+        // trackingArr.push({ time: new Date().toTimeString(), event: EVENT_TYPES.INPUT, name: field.name, value: field.value, elemId: event.target.id })
+    });
+});
 
-//     fetch(BASE_URL + 'sessionend', {
-//         method: 'post',
-//         headers: {
-//             "Content-Type": "application/json"
-//         },
-//         body: JSON.stringify({ data: trackingArr, duration })
-//     }).catch((err) => {
-//         console.log("err", err.code, err.message);
-//         // alert('Something went Wrong')
-//     })
+endSessionBtn.addEventListener('click', async (e) => {
 
-//     document.removeEventListener('mousemove')
-//     document.removeEventListener('click')
-//     trackingArr = []
-// })
+    e.preventDefault()
+    const duration = new Date().getTime() - startTime
+    captureScreenShot()
+
+    fetch('/sessionend', {
+        method: 'post',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ data: trackingArr, duration })
+    }).catch((err) => {
+        console.log("err", err.code, err.message);
+        // alert('Something went Wrong')
+    })
+    document.removeEventListener('mousemove')
+    document.removeEventListener('click')
+    trackingArr = []
+})
 
 /**
  * Image size is Approx 32kb
@@ -141,24 +154,15 @@ async function captureDom() {
  */
 
 document.getElementById('capture').addEventListener('click', function () {
+    captureScreenShot()
+});
+
+function captureScreenShot() {
     html2canvas(document.body).then(function (canvas) {
         sendCanvasToApi(canvas)
-        // // Convert canvas to data URL
-        // canvas.toBlob((blob) => {
-        //     // Send data URL to server
-        //     fetch('/save-file', {
-        //         method: 'POST',
-        //         // body: JSON.stringify({ dataURL: dataURL }),
-        //         body: blob,
-        //         headers: {
-        //             'Content-Type': 'application/octet-stream'
-        //         }
-        //     }).then(function (response) {
-        //         console.log('Screenshot saved');
-        //     });
-        // }, 'image/jpeg', 50);
+        changed = false
     });
-});
+}
 
 function sendCanvasToApi(canvas) {
     canvas.toBlob((blob) => {
@@ -172,7 +176,9 @@ function sendCanvasToApi(canvas) {
             }
         }).then(function (response) {
             console.log('Screenshot saved');
-        });
+        }).catch((Err) => {
+            console.log("error=>>>", Err)
+        })
     }, 'image/jpeg', 50);
 }
 

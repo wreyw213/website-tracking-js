@@ -41,8 +41,23 @@ async function getTrackDataApi() {
     }).then((res) => res.json()).then((resp) => {
         console.log("response", resp.data)
         renderImage(resp.data, 0)
-
     })
+
+    try {
+        const res = await fetch("/gettrackingdata", {
+            method: 'post',
+            headers: {
+                "Content-Type": "application/json"
+            },
+        })
+
+        const resData = await res.json()
+
+        console.log("data", resData);
+        startTracking(resData.data)
+    } catch {
+        alert('no data found')
+    }
 }
 
 function renderImage(data, index) {
