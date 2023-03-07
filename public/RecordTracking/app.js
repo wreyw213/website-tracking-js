@@ -26,16 +26,51 @@ const EVENT_TYPES = {
     INPUT: 'input'
 }
 
+const canvas = document.querySelector('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+const image = new Image();
+
+
 window.onload = getTrackDataApi
 
 async function getTrackDataApi() {
-    var image = new Image();
-    const imageData = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABjklEQVQ4T43TsUoDQRSF4T8EkVcAPJiBUhCQ9GR1E0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ06an/2U1BPEU/PT6U+nh6Uubq6TqN6ejow9eN/YdlL1zq3q3o/XyFrldLLiCNYh1YRQ1CvGZLzX0fE/BhOarW0ie5zHQth5Q1d0NFHw4W8ItvAV1MX9Xtuv9zPpVus/tm+HwYJlWH8grlv/2V9tdNzxnH+V7fnJxNk00I7+T3Tq3W7zh8XFvALlfX9ynUvvAYs2fljbfpU6JjU6R0fJlKVL+hO28ibyGztvP9o9/HKz/X1lJzLgIpf1PVQ+ErGGzJFLLoRfIgTK+KT8XJkkq3nTdYiChpF0NhWIFaOqL3G+rqEdvNtTWHW2MNxF/36NGILR/WTw/fmEQ11W8/pSGBS+Lss2XTvHYh/YJ0b9+4BfM4YH38wByBxP8c+NyS+i/e1OrbGvzfogStn9X4C4nbc/nfYAAAAAElFTkSuQmCC';
+    fetch('/all-screenshots', {
+        method: 'get'
+    }).then((res) => res.json()).then((resp) => {
+        console.log("response", resp.data)
+        renderImage(resp.data, 0)
 
-    // Set image source to data URI
-    const imgElement = document.getElementById('my-image');
-    imgElement.src = imageData;
+    })
 }
+
+function renderImage(data, index) {
+    console.log("data=>>>>", data, data.length, index)
+
+    if (data && data.length > index) {
+        image.src = `/screenshot/${data[index]}`;
+        console.log("`/screenshot/${data[index]}`", `/screenshot/${data[index]}`)
+        image.onload = () => {
+            const drawImageOnCanvas = () => {
+                ctx.drawImage(image, 0, 0);
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        renderImage(data, index + 1);
+                    }, 200);
+                });
+            };
+            requestAnimationFrame(drawImageOnCanvas);
+        };
+        image.onerror = () => {
+            console.log(`Failed to load image: /screenshot/${data[index]}`);
+            setTimeout(() => {
+                renderImage(data, index);
+            }, 200);
+        };
+    }
+}
+
 
 function renderDom(data, index) {
     if (data && data.length < index) {

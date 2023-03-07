@@ -142,23 +142,55 @@ async function captureDom() {
 
 document.getElementById('capture').addEventListener('click', function () {
     html2canvas(document.body).then(function (canvas) {
-        document.body.appendChild(canvas);
-
-        // Convert canvas to data URL
-        canvas.toBlob((blob) => {
-            // Send data URL to server
-            fetch('/save-file', {
-                method: 'POST',
-                // body: JSON.stringify({ dataURL: dataURL }),
-                body: blob,
-                headers: {
-                    'Content-Type': 'application/octet-stream'
-                }
-            }).then(function (response) {
-                console.log('Screenshot saved');
-            });
-        }, 'image/jpeg', 50);
+        sendCanvasToApi(canvas)
+        // // Convert canvas to data URL
+        // canvas.toBlob((blob) => {
+        //     // Send data URL to server
+        //     fetch('/save-file', {
+        //         method: 'POST',
+        //         // body: JSON.stringify({ dataURL: dataURL }),
+        //         body: blob,
+        //         headers: {
+        //             'Content-Type': 'application/octet-stream'
+        //         }
+        //     }).then(function (response) {
+        //         console.log('Screenshot saved');
+        //     });
+        // }, 'image/jpeg', 50);
     });
 });
+
+function sendCanvasToApi(canvas) {
+    canvas.toBlob((blob) => {
+        // Send data URL to server
+        fetch('/save-file', {
+            method: 'POST',
+            // body: JSON.stringify({ dataURL: dataURL }),
+            body: blob,
+            headers: {
+                'Content-Type': 'application/octet-stream'
+            }
+        }).then(function (response) {
+            console.log('Screenshot saved');
+        });
+    }, 'image/jpeg', 50);
+}
+
+// const observer = new MutationObserver(() => {
+//     const element = document.documentElement;
+//     // html2canvas(element).then(canvas => {
+//     console.log("___________");
+//     // sendCanvasToApi(canvas)
+//     // const screenshot = canvas.toDataURL();
+//     // axios.post('https://example.com/api/screenshots', { screenshot });
+//     // });
+// });
+
+// observer.observe(document.documentElement, {
+//     childList: true,
+//     subtree: true,
+//     attributes: true,
+//     characterData: true,
+// });
 
 
