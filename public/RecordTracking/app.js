@@ -26,14 +26,14 @@ const EVENT_TYPES = {
     INPUT: 'input'
 }
 
-const canvas = document.querySelector('canvas');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+// const canvas = document.querySelector('canvas');
+// const ctx = canvas.getContext('2d');
+// canvas.width = window.innerWidth;
+// canvas.height = window.innerHeight;
 const image = new Image();
 
 
-window.onload = getTrackDataApi
+// window.onload = getTrackDataApi
 
 async function getTrackDataApi() {
     fetch('/all-screenshots', {

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Save DOM Tree to LocalStorage</title>
+</head>
+
+<body>
+    <!-- <button id="save-btn">Save DOM Tree</button> -->
+    <div id="render-container"></div>
+
+    <!-- <script>
+        // Get the DOM tree object
+        const domTree = document.documentElement;
+
+        // Save the DOM tree object to LocalStorage
+        localStorage.setItem('domTree', domTree.outerHTML);
+
+        // Render the saved DOM tree object on the page
+        const renderContainer = document.getElementById('render-container');
+        renderContainer.innerHTML = localStorage.getItem('domTree');
+
+        // Add event listener to button
+        const saveButton = document.getElementById('save-btn');
+        saveButton.addEventListener('click', () => {
+            localStorage.setItem('domTree', domTree.outerHTML);
+            renderContainer.innerHTML = localStorage.getItem('domTree');
+        });
+    </script> -->
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>

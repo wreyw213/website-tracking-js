@@ -45,3 +45,8 @@ form {
     border-radius: 3px;
     background: teal;
 }
+
+#upload-form {
+    margin-top: 200px;
+    align-self: center;
+}
